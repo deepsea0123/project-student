@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('拉取代码') {
+            steps {
+                checkout([$class: 'SubversionSCM', additionalCredentials: [], excludedCommitMessages: '', excludedRegions: '', excludedRevprop: '', excludedUsers: '', filterChangelog: false, ignoreDirPropChanges: false, includedRegions: '', locations: [[cancelProcessOnExternalsFail: true, credentialsId: 'f922a2a7-ea2d-4dd3-8eec-216393fb133b', depthOption: 'infinity', ignoreExternalsOption: true, local: '.', remote: 'svn://119.91.114.137/student/library-system-master']], quietOperation: true, workspaceUpdater: [$class: 'UpdateUpdater']])
+            }
+        }
+		stage('拉取完成') {
+            steps {
+                echo '拉取完成'
+            }
+        }
+        stage('编译构建') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+		stage('构建完成') {
+            steps {
+                echo '构建完成'
+            }
+        }
+        stage('远程部署') {
+            steps {
+                deploy adapters: [tomcat8(credentialsId: '8968847e-50a4-48e6-881e-81b31a309928', path: '', url: 'http://119.91.114.137:8078')], contextPath: null, war: 'target/*.war'
+            }
+        }
+		stage('部署完成') {
+            steps {
+                echo '部署完成'
+            }
+        }
+    }
+}
